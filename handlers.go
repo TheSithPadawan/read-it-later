@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"log"
 	"net/http"
 )
 
@@ -13,6 +14,7 @@ func SaveArticleHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	Articles = append(Articles, article)
+	AddToDB(article)
 	w.WriteHeader(http.StatusCreated)
 	json.NewEncoder(w).Encode(map[string]string{"message": "Article saved to collection!"})
 }
@@ -20,5 +22,9 @@ func SaveArticleHandler(w http.ResponseWriter, r *http.Request) {
 // Retrieve all articles
 func GetArticlesHandler(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(Articles)
+	results, err := GetAllArticles()
+	if err != nil {
+		log.Fatal(err)
+	}
+	json.NewEncoder(w).Encode(results)
 }
